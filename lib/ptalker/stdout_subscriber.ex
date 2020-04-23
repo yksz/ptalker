@@ -1,7 +1,5 @@
 defmodule Ptalker.StdoutSubscriber do
-  @moduledoc """
-  Documentation for Ptalker.
-  """
+  defstruct pid: nil
 
   def start do
     Task.start_link(fn -> loop(%{}) end)
@@ -15,7 +13,7 @@ defmodule Ptalker.StdoutSubscriber do
     end
   end
 
-  def on_received(pid, message) do
+  def on_received(%Ptalker.StdoutSubscriber{pid: pid}, message) when pid != nil do
     send pid, {:on_received, message}
   end
 end
