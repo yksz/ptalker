@@ -1,19 +1,28 @@
 defmodule Ptalker.StdoutSubscriber do
+  @moduledoc """
+  This is the subscriber module that sends the messages from the publishers to Stdout.
+  """
+
   defstruct pid: nil
 
   def start do
-    Task.start_link(fn -> loop(%{}) end)
+    Task.start_link(fn -> message_loop(%{}) end)
   end
 
-  defp loop(map) do
+  defp message_loop(map) do
     receive do
-      {:on_received, message} ->
-        IO.puts("StdoutSubscriber: on_received: " <> message)
-        loop(map)
+      {:dispatch, message} ->
+        broadcast(message)
+        message_loop(map)
     end
   end
 
-  def on_received(%Ptalker.StdoutSubscriber{pid: pid}, message) when pid != nil do
-    send pid, {:on_received, message}
+  defp broadcast(message) do
+    require Logger
+    Logger.info(message)
+  end
+
+  def dispatch(%Ptalker.StdoutSubscriber{pid: pid}, message) when pid != nil do
+    send pid, {:dispatch, message}
   end
 end

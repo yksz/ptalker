@@ -1,8 +1,11 @@
 defmodule Ptalker.StdinPublisher do
   @moduledoc """
-  Documentation for Ptalker.
+  This is the publisher module that sends the messages from Stdin to the subscribers.
   """
 
+  @doc """
+  Starts the process of this publisher.
+  """
   def start do
     Task.start_link(fn -> loop(%{}) end)
   end

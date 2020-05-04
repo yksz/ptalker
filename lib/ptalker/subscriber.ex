@@ -1,9 +1,18 @@
 defprotocol Ptalker.Subscriber do
-  def on_received(subscriber, message)
+  @doc """
+  Sends the message to the subscriber.
+  """
+  def dispatch(subscriber, message)
 end
 
 defimpl Ptalker.Subscriber, for: Ptalker.StdoutSubscriber do
-  def on_received(subscriber, message) do
-    Ptalker.StdoutSubscriber.on_received(subscriber, message)
+  def dispatch(subscriber, message) do
+    Ptalker.StdoutSubscriber.dispatch(subscriber, message)
+  end
+end
+
+defimpl Ptalker.Subscriber, for: Ptalker.TcpSubscriber do
+  def dispatch(subscriber, message) do
+    Ptalker.TcpSubscriber.dispatch(subscriber, message)
   end
 end

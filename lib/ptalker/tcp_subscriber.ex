@@ -1,20 +1,28 @@
 defmodule Ptalker.TcpSubscriber do
+  @moduledoc """
+  This is the subscriber module that sends the messages from the publishers to the TCP client.
+  """
+
   defstruct pid: nil
 
   def start do
-    Task.start_link(fn -> loop(%{}) end)
+    Task.start_link(fn -> message_loop(%{}) end)
   end
 
-  defp loop(map) do
+  defp message_loop(map) do
     receive do
-      {:on_received, message} ->
-        IO.puts("TcpSubscriber: on_received: " <> message)
-        loop(map)
+      {:dispatch, message} ->
+        broadcast(message)
+        message_loop(map)
     end
   end
 
-  def on_received(%Ptalker.TcpSubscriber{pid: pid}, message) when pid != nil do
-    # connect and send message
-    send pid, {:on_received, message}
+  defp broadcast(message) do
+    # Connect and send message to the host
+    IO.puts("TcpSubscriber: " <> message)
+  end
+
+  def dispatch(%Ptalker.TcpSubscriber{pid: pid}, message) when pid != nil do
+    send pid, {:dispatch, message}
   end
 end

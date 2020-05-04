@@ -1,8 +1,19 @@
 defmodule Ptalker.TcpPublisher do
+  @moduledoc """
+  This is the publisher module that sends the messages from the TCP server to the subscribers.
+  """
+
   require Logger
 
   defstruct pid: nil
 
+  @doc """
+  Starts the process of this publisher and the TCP server.
+
+  ## Parameters
+    - port: A port number of the TCP server.
+
+  """
   def start(port) do
     # The options below mean:
     #
@@ -13,13 +24,13 @@ defmodule Ptalker.TcpPublisher do
     #
     {:ok, socket} = :gen_tcp.listen(port, [:binary, packet: :line, active: false, reuseaddr: true])
     Logger.info("Accepting connections on port #{port}")
-    Task.start_link(fn -> loop_acceptor(socket) end)
+    Task.start_link(fn -> accept_loop(socket) end)
   end
 
-  defp loop_acceptor(socket) do
+  defp accept_loop(socket) do
     {:ok, client} = :gen_tcp.accept(socket)
     Task.start_link(fn -> serve(client) end)
-    loop_acceptor(socket)
+    accept_loop(socket)
   end
 
   defp serve(socket) do
